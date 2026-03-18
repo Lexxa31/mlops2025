@@ -1,6 +1,8 @@
 import pickle
 import pandas as pd
 import yaml
+import json
+import os
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
@@ -17,6 +19,7 @@ def evaluate_model():
         model = pickle.load(f)
 
     df = pd.read_csv("data/processed/dataset.csv")
+    n_rows = df.shape[0]  # количество строк в данных
 
     X = df[["total_bill", "size"]]
     y = df["high_tip"]
@@ -29,6 +32,18 @@ def evaluate_model():
     accuracy = accuracy_score(y_test, y_pred)
 
     print(f"Accuracy: {accuracy:.4f}")
+    print(f"Total rows in dataset: {n_rows}")
+
+    # Сохраняем метрики в JSON
+    metrics = {
+        "accuracy": accuracy,
+        "n_rows": n_rows
+    }
+
+    # Гарантируем существование папки (хотя по условию она уже создана)
+    os.makedirs("metrics", exist_ok=True)
+    with open("metrics/metrics.json", "w") as f:
+        json.dump(metrics, f, indent=4)
 
 
 if __name__ == "__main__":
